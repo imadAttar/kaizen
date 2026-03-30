@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "kaizen",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Continuous improvement toolkit for Claude Code: full dev pipeline (code) and environment coaching (coach). Built around /coach — the central habit for keeping your setup healthy and evolving.",
   "owner": {
     "name": "imadAttar"
@@ -10,7 +10,7 @@
     {
       "name": "kaizen",
       "description": "Continuous improvement toolkit for Claude Code: full dev pipeline (code) and environment coaching (coach). Built around /coach — the central habit for keeping your setup healthy and evolving.",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "imadAttar"
       },
