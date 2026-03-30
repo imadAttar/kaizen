@@ -1,0 +1,10 @@
+{
+  "name": "kaizen",
+  "description": "Continuous improvement toolkit for Claude Code: full dev pipeline (code) and environment coaching (coach). Built around /coach — the central habit for keeping your setup healthy and evolving.",
+  "version": "1.1.0",
+  "author": {
+    "name": "imadAttar"
+  },
+  "homepage": "https://github.com/imadAttar/kaizen",
+  "license": "MIT"
+}

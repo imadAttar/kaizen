@@ -14,7 +14,7 @@
       "author": {
         "name": "imadAttar"
       },
-      "source": ".",
+      "source": "./plugins/kaizen",
       "category": "productivity"
     }
   ]
