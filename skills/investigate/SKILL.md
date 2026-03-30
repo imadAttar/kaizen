@@ -37,7 +37,7 @@ Examples:
 
 ## Adaptive model selection
 
-Before investigating, classify complexity to pick the right model. Always delegate to an agent with the selected model — never run inline.
+Before investigating, classify complexity to pick the right model.
 
 | Complexity | Signals | Model |
 |-----------|---------|-------|
@@ -49,7 +49,9 @@ Before investigating, classify complexity to pick the right model. Always delega
 1. Read the symptom (1 sentence)
 2. If ≤1 file + clear error → Simple. If 2-5 files + specific symptom → Medium. If cross-system or vague → Complex.
 3. When in doubt, default to sonnet — best compromise between speed and quality.
-4. Spawn an Agent with the selected model. Pass the full Protocol (Phase 0–4), Output format, and Rules sections as the agent prompt, prefixed with the user's symptom.
+4. **Invocation mode**:
+   - **Called directly by the user**: spawn an Agent with the selected model, passing the full Protocol (Phase 0–4), Output format, and Rules sections as the agent prompt, prefixed with the user's symptom.
+   - **Called from an orchestrator** (e.g. `/code`): apply the protocol inline at the selected model level — do not spawn an extra agent layer. The orchestrator's CHECKPOINT 1 handles user validation after this skill completes, so Phase 4's "Wait for user validation" is already covered — present findings and return, but do not ask for validation again.
 
 **Override:** If the user specifies a model explicitly, use that model regardless of classification.
 
@@ -205,7 +207,7 @@ Entry point -> ... -> Bug location -> Incorrect result
 | Fix completeness | X% | [what could be missed] |
 | **Overall** | **X%** | |
 
-If any aspect is below 80%: explicitly state what is missing and what action would raise confidence (reproduce, read specific file, check logs, ask user).
+If any aspect is below 80%, or if Overall confidence is below 70%: explicitly state what is missing and what action would raise confidence (reproduce, read specific file, check logs, ask user).
 ```
 
 ## Rules

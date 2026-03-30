@@ -37,12 +37,12 @@ I will implement:
 - Execution order: [parallel groups and sequential dependencies]
 ```
 
-Wait for user validation unless the scope is trivial (1-2 files, obvious fix).
+Wait for user validation unless the scope is trivial (1-2 files, obvious fix) or the plan was already validated by an orchestrator's checkpoint (e.g., `/code` CHECKPOINT 1).
 
 ### Phase 2: Implement
 
 Apply changes following project conventions:
-- Follow `.claude/rules/` if present for code style, conventions, etc.
+- Follow `CLAUDE.md` (root or `.claude/`) and `.claude/rules/` if present for code style, conventions, etc.
 - Follow existing patterns in the codebase (naming, structure, error handling)
 - Strict scope — only what's in the plan. No "while I'm here" improvements.
 - **Minor adjustments allowed**: imports, trivial type adaptations, or method signatures that the plan couldn't anticipate are OK without asking. If in doubt, ask.
@@ -60,6 +60,7 @@ For multi-step plans from `/analyze`:
 - 2 independent steps → 2 agents
 - 3-4 independent steps → 3-4 agents
 - Steps with dependencies → sequential, wait for the dependency to complete first
+- **Steps that modify the same file must be sequential** — two agents writing to the same file will produce conflicts. Group same-file changes into one agent even if logically independent.
 
 Example: "Add new Handler" and "Add i18n messages" are independent → parallel. "Update Handler to use new Store" depends on "Create new Store" → sequential.
 
@@ -110,7 +111,7 @@ Re-read the diff against the original plan — did we miss anything? Did we add 
 - [ ] [what was skipped and why]
 
 ## Ready for
-- `/review-impl` — quick review of changes
+- `/verify` — quick review of changes
 - `/commit` — commit changes
 ```
 

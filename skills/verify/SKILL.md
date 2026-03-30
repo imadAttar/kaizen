@@ -5,7 +5,7 @@ user-invocable: true
 argument-hint: "[optional: specific file or concern to focus on]"
 ---
 
-# Review Implementation
+# Verify — Quick implementation review
 
 Quick review of changes produced by `/implement`. Scoped to the current session's diff only.
 
@@ -23,9 +23,9 @@ If no prior context exists, fall back to reviewing uncommitted changes (`git dif
 
 Get all changes from this session:
 ```bash
-git diff          # unstaged
-git diff --cached # staged
-git status        # new untracked files
+git diff          # unstaged changes
+git diff --cached # staged changes
+git status        # lists new untracked files — do NOT skip this
 ```
 
 If already committed:
@@ -33,11 +33,11 @@ If already committed:
 git diff HEAD~1   # last commit
 ```
 
-Include **new files** (untracked) — `git diff` misses them. Check `git status` for untracked files and read them.
+**Important**: `git diff` does NOT show new files. Always run `git status` and explicitly read any untracked files that belong to this session — they are part of the changes to review.
 
 ### Phase 2: Plan vs Implementation
 
-Compare what was planned (from `/investigate` or `/analyze` output in the conversation) against what was actually implemented:
+Compare what was planned (from `/investigate` or `/analyze` output in the conversation) against what was actually implemented. If no plan is available in context, skip this phase and note it as a gap in the output.
 
 | Planned change | Implemented? | Correct? |
 |----------------|-------------|----------|
@@ -57,7 +57,7 @@ For each modified file, verify:
 
 1. Were tests added for the new/modified code?
 2. Do the tests cover the **happy path** and at least one **error path**?
-3. For `[manual]` tests (from `/analyze` plan) — are they documented with clear verification steps for the user?
+3. For `[manual]` tests (from `/investigate` Phase 1.5 or `/analyze` plan) — are they documented with clear verification steps for the user?
 4. Are existing tests still passing? (check if `/implement` reported test results)
 
 ### Phase 5: Bugs & correctness
@@ -73,7 +73,7 @@ For each change in the diff, verify the logic:
 
 If the project has a formatter/linter configured (.prettierrc, .eslintrc, checkstyle.xml, rustfmt.toml, .editorconfig, pyproject.toml, etc.):
 - Check if modified files conform to project formatting rules
-- Flag violations as P3 (minor) — they should have been caught by `/implement` Step 4, so their presence indicates a gap
+- Flag violations as P3 (minor)
 - If no formatter/linter is configured, skip
 
 ### Phase 7: Performance quick-check
@@ -107,6 +107,8 @@ Skip if changes are purely internal logic.
 | Sev | File:line | Issue | Suggestion |
 |-----|-----------|-------|------------|
 | P1/P2/P3 | ... | ... | ... |
+
+Omit this table entirely if no findings.
 
 P1 = blocker (wrong behavior, data loss, security)
 P2 = significant (perf regression, missing error handling, weak test)

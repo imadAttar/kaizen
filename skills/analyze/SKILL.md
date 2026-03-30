@@ -13,7 +13,21 @@ $ARGUMENTS
 
 Accepts: Jira ticket, GitHub issue/PR, GitLab issue/MR, URL, or free-text description.
 
-Reuse the input parsing protocol from the `investigate` skill (adaptive: MCP → CLI → ask user to paste).
+### Input parsing
+
+**Adaptive**: use whatever tool is available (MCP first, then CLI, then ask the user to paste).
+
+**If the input is a ticket** (Jira, GitHub issue, GitLab issue):
+- Try to fetch via MCP or CLI (`gh issue view`, `glab issue view`). If unavailable, ask the user (in their language) to paste the ticket content.
+- Extract: summary, description, acceptance criteria, attachments list, linked issues
+
+**If the input is a PR or MR**:
+- `gh pr view <PR>` or `glab mr view <MR>`
+- Use the PR description and linked issue as the feature requirement
+
+**If the input is a CI run or build failure**: forward to `/investigate` — `/analyze` is for features/evolutions, not bugs.
+
+**If the input is free text**: use as-is.
 
 ## Protocol
 

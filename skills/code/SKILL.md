@@ -17,25 +17,25 @@ Accepts: free text, ticket ID/URL (Jira, GitHub, GitLab), bug description, PR li
 
 ## Adaptive model selection
 
-/code orchestrates multiple phases. Each phase delegates to an agent with the right model — never inline.
+/code orchestrates multiple phases. Analysis and implementation phases delegate to sub-agents; Phase 0 and checkpoints run inline (no sub-agent, no model selection needed).
 
 | Phase | Model |
 |-------|-------|
-| **Pre-check** (git status, env) | `model: "haiku"` (trivial checks) |
-| **Diagnose** (/investigate) | Follows investigate's own triage (haiku/sonnet/opus) |
+| **Phase 0** (pre-check, inline) | — (no sub-agent spawned) |
+| **Diagnose** (/investigate or /analyze) | Follows the sub-skill's own triage (haiku/sonnet/opus) |
 | **Implement** | `model: "sonnet"` (best speed/quality for code writing) |
-| **Review** | Follows review's own triage (haiku/sonnet/opus) |
+| **Verify** (/verify) | `model: "sonnet"` (scoped review, no deep architecture analysis) |
 | **Corrections** | `model: "sonnet"` |
 
 **Override:** If the user specifies a model explicitly, use that model for all phases.
 
 ## Progress Display
 
-At EACH phase transition, display a progress banner:
+At EACH phase transition, display a progress banner. Phases 1–5 are the main work phases (Phase 0 is silent pre-check):
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Phase N/6 — PHASE_NAME
+Phase N/5 — PHASE_NAME
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -49,20 +49,13 @@ Before any work, verify the environment is ready:
    - If user says stash → `git stash push -m "pre-code-pipeline"`
    - If user says continue → proceed but warn that changes will mix
 2. **Branch strategy**: check the current branch
-   - If on `main`/`master`/`develop` → propose creating a feature branch: `git checkout -b <type>/<short-description>`
+   - If on `main`/`master`/`develop` → propose creating a feature branch: `git checkout -b <type>/<short-description-derived-from-input>`
    - If already on a feature branch → proceed
    - If user declines branch creation → proceed on current branch
 
 ## Phase 1 — DIAGNOSE
 
-### Step 1: Parse the input
-
-Delegate to the chosen skill's input parsing (adaptive: MCP → CLI → ask user to paste).
-The sub-skills handle all input formats: Jira, GitHub, GitLab, PR, CI run, free text.
-
-If a tool or access is unavailable, the sub-skill will ask the user to provide the information. Do not block the pipeline.
-
-### Step 2: Classify the work type
+### Step 1: Classify the work type
 
 After reading the input, EXPLICITLY explain your classification reasoning:
 
@@ -78,9 +71,9 @@ Decision criteria:
 - **Feature / evolution / refactoring / exploration** → `/analyze` — focus on plan, impact, complexity
 - If ambiguous → ask the user before proceeding
 
-### Step 3: Execute the chosen skill
+### Step 2: Execute the chosen skill
 
-Apply the selected skill's protocol.
+Apply the selected skill's protocol. The sub-skill handles all input formats (Jira, GitHub, GitLab, PR, CI run, free text) and will ask the user if access is unavailable. Do not block the pipeline.
 
 ### CHECKPOINT 1 — Diagnostic validation
 
@@ -90,6 +83,8 @@ Present the output of `/investigate` or `/analyze`. Include:
 - For bugs: reproduction status (reproduced / code analysis only / awaiting user confirmation)
 - For features: testability assessment (auto / manual / mixed)
 - Any information gaps that the user could fill
+
+**Special case — FALSE POSITIVE**: If `/investigate` concluded the issue is a false positive, present the evidence clearly and **stop the pipeline here**. Ask the user to confirm whether to close the ticket or investigate further. Do not proceed to Phase 2.
 
 **Wait for user validation before continuing.** The user may:
 - Validate → proceed to Phase 2
@@ -114,23 +109,13 @@ Apply `/implement` protocol on the validated plan.
 
 ## Phase 3 — TEST
 
-`/implement` already writes and runs tests it can execute (Phase 3 of `/implement`). This phase handles what `/implement` couldn't:
+`/implement` already ran targeted tests (new tests + related regression tests). This phase covers what it couldn't:
 
-1. **Check `/implement`'s test report** — read the "Tests" section from `/implement`'s output:
-   - If all auto-tests passed and no manual tests needed → proceed to Phase 4
-   - If auto-tests had failures → they should already be fixed by `/implement` (2 attempts). If still failing, diagnose here.
+1. **If `/implement` reported failures** still unresolved after 2 attempts → diagnose and fix here before continuing.
 
-2. **Run broader test suite** if not already done by `/implement`:
-   - Module-level or full test suite to catch indirect regressions
-   - Only if CLI runner is available (mvn test, npm test, pytest, etc.)
-   - If unavailable, skip — `/implement` already ran the targeted tests
+2. **Broader regression check** — if a CLI runner is available and wasn't already triggered by `/implement`, run the module-level or full test suite to catch indirect regressions in unrelated parts of the code.
 
-3. **Manual test checklist** — consolidate all `[manual]` items from `/implement`'s report and `/analyze`'s plan:
-   - Present a numbered checklist to the user with specific commands/steps
-   - Ask for confirmation before proceeding to Phase 4
-   - If no manual tests needed → proceed directly
-
-This avoids re-running tests that `/implement` already executed.
+3. **Manual test checklist** — collect all `[manual]` items from two sources: `/implement`'s "Manual verification needed" list and the diagnostic plan's `[manual]` annotations. Deduplicate and present as a numbered checklist. Ask for user confirmation before proceeding to Phase 4. If there are none, proceed directly.
 
 ## Phase 4 — REVIEW
 
@@ -141,7 +126,7 @@ Apply `/verify` protocol.
 ### If GOOD TO COMMIT → Phase 5
 ### If FIX NEEDED:
 1. Apply the correction plan by re-running `/implement` on the fixes (not by `/verify` itself)
-2. Re-run Phase 3 (test) + Phase 4 (review)
+2. Re-run tests + `/verify` — these are internal correction iterations, do not display Phase banners again
 3. Max 2 correction iterations before escalating to user
 
 ## Phase 5 — FINALIZE
