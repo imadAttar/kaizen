@@ -1,7 +1,7 @@
 {
   "name": "kaizen",
-  "description": "Continuous improvement toolkit for Claude Code: full dev pipeline (code) and environment coaching (coach). Built around /coach — the central habit for keeping your setup healthy and evolving.",
-  "version": "1.2.0",
+  "description": "A single-skill plugin built around /coach — a maintenance habit for your Claude Code environment. Audits your setup (skills, hooks, rules, memory, CLAUDE.md, plugins), scores it, and produces prioritized, ready-to-apply improvements.",
+  "version": "2.0.0",
   "author": {
     "name": "imadAttar"
   },

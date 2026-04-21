@@ -102,7 +102,7 @@ Ask: "Want to document another rule in this area, switch to a different area, or
 
 ### 7. Final Report
 
-After all rules are created, run the **Rules Audit** (Step 1.7 from main SKILL.md) on the newly created files to validate quality.
+After all rules are created, run the **Rules Audit** (`references/rules-audit.md`) on the newly created files to validate quality.
 
 ## Output
 
