@@ -71,14 +71,12 @@ Once your environment is set up, use `/kaizen:code` for end-to-end resolution of
 
 ## Installation
 
-```bash
-/plugin install kaizen@claude-plugins-official
-```
-
-Or directly from GitHub:
+Add the repo as a marketplace, then install:
 
 ```bash
-/plugin install github:imadAttar/kaizen
+/plugin marketplace add imadAttar/kaizen
+/plugin install kaizen@imadAttar/kaizen
+/reload-plugins
 ```
 
 Then run `/kaizen:coach` in your project to get started.
