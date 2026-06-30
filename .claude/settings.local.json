@@ -1,0 +1,47 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/session-state.sh",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/session-state.sh",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/session-state.sh",
+            "timeout": 3000
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(cp ~/.claude/skills/coach/SKILL.md /Users/imad/Documents/workspace/kaizen/plugins/kaizen/skills/coach/SKILL.md)",
+      "Bash(cp ~/.claude/skills/coach/references/checklists/hooks.md /Users/imad/Documents/workspace/kaizen/plugins/kaizen/skills/coach/references/checklists/hooks.md)",
+      "Bash(rtk diff *)"
+    ]
+  }
+}
